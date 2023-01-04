@@ -140,6 +140,7 @@ def run_bind():
                     func = send_image_and_dimensions if destination_width_component else lambda x: x
                     jsfunc = None
 
+<<<<<<< Updated upstream
                 button.click(
                     fn=func,
                     _js=jsfunc,
@@ -150,6 +151,11 @@ def run_bind():
             if send_generate_info and fields is not None:
                 if send_generate_info in paste_fields:
                     paste_field_names = ['Prompt', 'Negative prompt', 'Steps', 'Face restoration'] + (["Seed"] if shared.opts.send_seed else [])
+=======
+            if send_generate_info and paste_fields[tab]["fields"] is not None:
+                if send_generate_info in paste_fields:
+                    paste_field_names = ['Prompt', 'Negative prompt', 'Steps', 'Face restoration'] +  (['Size-1', 'Size-2'] if shared.opts.send_size else []) + (["Seed"] if shared.opts.send_seed else [])
+>>>>>>> Stashed changes
                     button.click(
                         fn=lambda *x: x,
                         inputs=[field for field, name in paste_fields[send_generate_info]["fields"] if name in paste_field_names],
@@ -190,6 +196,7 @@ def find_hypernetwork_key(hypernet_name, hypernet_hash=None):
     return None
 
 
+<<<<<<< Updated upstream
 def restore_old_hires_fix_params(res):
     """for infotexts that specify old First pass size parameter, convert it into
     width, height, and hr scale"""
@@ -219,6 +226,8 @@ def restore_old_hires_fix_params(res):
     res['Hires upscale'] = hr_scale
 
 
+=======
+>>>>>>> Stashed changes
 def parse_generation_parameters(x: str):
     """parses generation parameters string, the one you see in text field under the picture in UI:
 ```
@@ -276,8 +285,11 @@ Steps: 20, Sampler: Euler a, CFG scale: 7, Seed: 965400086, Size: 512x512, Model
         hypernet_hash = res.get("Hypernet hash", None)
         res["Hypernet"] = find_hypernetwork_key(hypernet_name, hypernet_hash)
 
+<<<<<<< Updated upstream
     restore_old_hires_fix_params(res)
 
+=======
+>>>>>>> Stashed changes
     return res
 
 

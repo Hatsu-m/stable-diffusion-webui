@@ -5,7 +5,11 @@ import modules.textual_inversion.textual_inversion
 from modules import devices, sd_hijack_optimizations, shared, sd_hijack_checkpoint
 from modules.hypernetworks import hypernetwork
 from modules.shared import cmd_opts
+<<<<<<< Updated upstream
 from modules import sd_hijack_clip, sd_hijack_open_clip, sd_hijack_unet, sd_hijack_xlmr, xlmr
+=======
+from modules import sd_hijack_clip, sd_hijack_open_clip, sd_hijack_unet
+>>>>>>> Stashed changes
 
 from modules.sd_hijack_optimizations import invokeAI_mps_available
 
@@ -35,8 +39,11 @@ def apply_optimizations():
 
     ldm.modules.diffusionmodules.model.nonlinearity = silu
     ldm.modules.diffusionmodules.openaimodel.th = sd_hijack_unet.th
+<<<<<<< Updated upstream
     
     optimization_method = None
+=======
+>>>>>>> Stashed changes
 
     if cmd_opts.force_enable_xformers or (cmd_opts.xformers and shared.xformers_available and torch.version.cuda and (6, 0) <= torch.cuda.get_device_capability(shared.device) <= (9, 0)):
         print("Applying xformers cross attention optimization.")

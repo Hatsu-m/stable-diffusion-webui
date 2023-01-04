@@ -234,8 +234,11 @@ def load_model_weights(model, checkpoint_info, vae_file="auto"):
     model.sd_model_checkpoint = checkpoint_file
     model.sd_checkpoint_info = checkpoint_info
 
+<<<<<<< Updated upstream
     model.logvar = model.logvar.to(devices.device)  # fix for training
 
+=======
+>>>>>>> Stashed changes
     sd_vae.delete_base_vae()
     sd_vae.clear_loaded_vae()
     vae_file = sd_vae.resolve_vae(checkpoint_file, vae_file=vae_file)
@@ -284,7 +287,10 @@ def enable_midas_autodownload():
 
     midas.api.load_model = load_model_wrapper
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 def load_model(checkpoint_info=None):
     from modules import lowvram, sd_hijack
     checkpoint_info = checkpoint_info or select_checkpoint()
@@ -307,6 +313,9 @@ def load_model(checkpoint_info=None):
         sd_config.model.params.conditioning_key = "hybrid"
         sd_config.model.params.unet_config.params.in_channels = 9
         sd_config.model.params.finetune_keys = None
+
+    if not hasattr(sd_config.model.params, "use_ema"):
+        sd_config.model.params.use_ema = False
 
     if not hasattr(sd_config.model.params, "use_ema"):
         sd_config.model.params.use_ema = False
@@ -335,7 +344,10 @@ def load_model(checkpoint_info=None):
     script_callbacks.model_loaded_callback(sd_model)
 
     print("Model loaded.")
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
     return sd_model
 
 
@@ -380,4 +392,8 @@ def reload_model_weights(sd_model=None, info=None):
 
     print("Weights loaded.")
 
+<<<<<<< Updated upstream
+=======
+    print("Weights loaded.")
+>>>>>>> Stashed changes
     return sd_model

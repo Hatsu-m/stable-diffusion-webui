@@ -94,6 +94,15 @@ def p_sample_plms(self, x, c, t, index, repeat_noise=False, use_original_steps=F
     x_prev, pred_x0 = get_x_prev_and_pred_x0(e_t_prime, index)
 
     return x_prev, pred_x0, e_t
+<<<<<<< Updated upstream
+=======
+
+# =================================================================================================
+# Monkey patch LatentInpaintDiffusion to load the checkpoint with a proper config.
+# Adapted from:
+# https://github.com/runwayml/stable-diffusion/blob/main/ldm/models/diffusion/ddpm.py
+# =================================================================================================
+>>>>>>> Stashed changes
 
 
 def should_hijack_inpainting(checkpoint_info):
@@ -102,10 +111,29 @@ def should_hijack_inpainting(checkpoint_info):
     ckpt_basename = os.path.basename(checkpoint_info.filename).lower()
     cfg_basename = os.path.basename(sd_models.find_checkpoint_config(checkpoint_info)).lower()
 
+<<<<<<< Updated upstream
+=======
+
+def should_hijack_inpainting(checkpoint_info):
+    ckpt_basename = os.path.basename(checkpoint_info.filename).lower()
+    cfg_basename = os.path.basename(checkpoint_info.config).lower()
+>>>>>>> Stashed changes
     return "inpainting" in ckpt_basename and not "inpainting" in cfg_basename
 
 
 def do_inpainting_hijack():
+<<<<<<< Updated upstream
     # p_sample_plms is needed because PLMS can't work with dicts as conditionings
+=======
+    # most of this stuff seems to no longer be needed because it is already included into SD2.0
+    # p_sample_plms is needed because PLMS can't work with dicts as conditionings
+    # this file should be cleaned up later if everything turns out to work fine
+
+    # ldm.models.diffusion.ddpm.get_unconditional_conditioning = get_unconditional_conditioning
+    # ldm.models.diffusion.ddpm.LatentInpaintDiffusion = LatentInpaintDiffusion
+
+    # ldm.models.diffusion.ddim.DDIMSampler.p_sample_ddim = p_sample_ddim
+    # ldm.models.diffusion.ddim.DDIMSampler.sample = sample_ddim
+>>>>>>> Stashed changes
 
     ldm.models.diffusion.plms.PLMSSampler.p_sample_plms = p_sample_plms

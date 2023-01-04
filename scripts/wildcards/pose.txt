@@ -1,0 +1,8 @@
+standing
+kneeling
+sitting
+lying down
+crouching
+leg up
+standing on one leg
+crossed legs

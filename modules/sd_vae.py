@@ -154,6 +154,7 @@ def load_vae(model, vae_file=None):
     cache_enabled = shared.opts.sd_vae_checkpoint_cache > 0
 
     if vae_file:
+<<<<<<< Updated upstream
         if cache_enabled and vae_file in checkpoints_loaded:
             # use vae checkpoint cache
             print(f"Loading VAE weights [{get_filename(vae_file)}] from cache")
@@ -175,6 +176,14 @@ def load_vae(model, vae_file=None):
         if cache_enabled:
             while len(checkpoints_loaded) > shared.opts.sd_vae_checkpoint_cache + 1: # we need to count the current model
                 checkpoints_loaded.popitem(last=False)  # LRU
+=======
+        assert os.path.isfile(vae_file), f"VAE file doesn't exist: {vae_file}"
+        print(f"Loading VAE weights from: {vae_file}")
+        store_base_vae(model)
+        vae_ckpt = torch.load(vae_file, map_location=shared.weight_load_location)
+        vae_dict_1 = {k: v for k, v in vae_ckpt["state_dict"].items() if k[0:4] != "loss" and k not in vae_ignore_keys}
+        _load_vae_dict(model, vae_dict_1)
+>>>>>>> Stashed changes
 
         # If vae used is not in dict, update it
         # It will be removed on refresh though

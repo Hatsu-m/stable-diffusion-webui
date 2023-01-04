@@ -336,14 +336,21 @@ def train_embedding(embedding_name, learn_rate, batch_size, gradient_step, data_
     loss_step = 0
     _loss_step = 0 #internal
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
     last_saved_file = "<none>"
     last_saved_image = "<none>"
     forced_filename = "<none>"
     embedding_yet_to_be_embedded = False
 
+<<<<<<< Updated upstream
     is_training_inpainting_model = shared.sd_model.model.conditioning_key in {'hybrid', 'concat'}
     img_c = None
 
+=======
+>>>>>>> Stashed changes
     pbar = tqdm.tqdm(total=steps - initial_step)
     try:
         for i in range((steps-initial_step) * gradient_step):

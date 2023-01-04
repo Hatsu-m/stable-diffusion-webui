@@ -124,10 +124,13 @@ class Api:
         self.add_api_route("/sdapi/v1/artist-categories", self.get_artists_categories, methods=["GET"], response_model=List[str])
         self.add_api_route("/sdapi/v1/artists", self.get_artists, methods=["GET"], response_model=List[ArtistItem])
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< Updated upstream
         self.add_api_route("/sdapi/v1/embeddings", self.get_embeddings, methods=["GET"], response_model=EmbeddingsResponse)
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> parent of fd4461d (Merge pull request #6196 from philpax/add-embeddings-api)
 =======
 >>>>>>> parent of fd4461d (Merge pull request #6196 from philpax/add-embeddings-api)
         self.add_api_route("/sdapi/v1/refresh-checkpoints", self.refresh_checkpoints, methods=["POST"])
@@ -366,6 +369,7 @@ class Api:
         return [{"name":x[0], "score":x[1], "category":x[2]} for x in shared.artist_db.artists]
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< Updated upstream
     def get_embeddings(self):
         db = sd_hijack.model_hijack.embedding_db
@@ -389,6 +393,8 @@ class Api:
 
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> parent of fd4461d (Merge pull request #6196 from philpax/add-embeddings-api)
 =======
 >>>>>>> parent of fd4461d (Merge pull request #6196 from philpax/add-embeddings-api)
     def refresh_checkpoints(self):

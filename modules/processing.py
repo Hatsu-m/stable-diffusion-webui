@@ -50,9 +50,9 @@ def apply_color_correction(correction, original_image):
         correction,
         channel_axis=2
     ), cv2.COLOR_LAB2RGB).astype("uint8"))
-    
+
     image = blendLayers(image, original_image, BlendType.LUMINOSITY)
-    
+
     return image
 
 
@@ -98,7 +98,7 @@ class StableDiffusionProcessing():
     """
     The first set of paramaters: sd_models -> do_not_reload_embeddings represent the minimum required to create a StableDiffusionProcessing
     """
-    def __init__(self, sd_model=None, outpath_samples=None, outpath_grids=None, prompt: str = "", styles: List[str] = None, seed: int = -1, subseed: int = -1, subseed_strength: float = 0, seed_resize_from_h: int = -1, seed_resize_from_w: int = -1, seed_enable_extras: bool = True, sampler_name: str = None, batch_size: int = 1, n_iter: int = 1, steps: int = 50, cfg_scale: float = 7.0, width: int = 512, height: int = 512, restore_faces: bool = False, tiling: bool = False, do_not_save_samples: bool = False, do_not_save_grid: bool = False, extra_generation_params: Dict[Any, Any] = None, overlay_images: Any = None, negative_prompt: str = None, eta: float = None, do_not_reload_embeddings: bool = False, denoising_strength: float = 0, ddim_discretize: str = None, s_churn: float = 0.0, s_tmax: float = None, s_tmin: float = 0.0, s_noise: float = 1.0, override_settings: Dict[str, Any] = None, override_settings_restore_afterwards: bool = True, sampler_index: int = None):
+    def __init__(self, sd_model=None, outpath_samples=None, outpath_grids=None, prompt: str = "", styles: List[str] = None, seed: int = -1, subseed: int = -1, subseed_strength: float = 0, seed_resize_from_h: int = -1, seed_resize_from_w: int = -1, seed_enable_extras: bool = True, sampler_name: str = None, batch_size: int = 1, n_iter: int = 1, steps: int = 50, cfg_scale: float = 7.0, width: int = 512, height: int = 512, restore_faces: bool = False, tiling: bool = False, do_not_save_samples: bool = False, do_not_save_grid: bool = False, extra_generation_params: Dict[Any, Any] = None, overlay_images: Any = None, negative_prompt: str = None, eta: float = None, do_not_reload_embeddings: bool = False, denoising_strength: float = 0, ddim_discretize: str = None, s_churn: float = 0.0, s_tmax: float = None, s_tmin: float = 0.0, s_noise: float = 1.0, override_settings: Dict[str, Any] = None, override_settings_restore_afterwards: bool = True, sampler_index: int = None, script_args: list = None):
         if sampler_index is not None:
             print("sampler_index argument for StableDiffusionProcessing does not do anything; use sampler_name", file=sys.stderr)
 
@@ -149,7 +149,7 @@ class StableDiffusionProcessing():
             self.seed_resize_from_w = 0
 
         self.scripts = None
-        self.script_args = None
+        self.script_args = script_args
         self.all_prompts = None
         self.all_negative_prompts = None
         self.all_seeds = None
@@ -157,7 +157,6 @@ class StableDiffusionProcessing():
         self.iteration = 0
 
     def txt2img_image_conditioning(self, x, width=None, height=None):
-<<<<<<< Updated upstream
         self.is_using_inpainting_conditioning = self.sd_model.model.conditioning_key in {'hybrid', 'concat'}
 
         return txt2img_image_conditioning(self.sd_model, x, width or self.width, height or self.height)
@@ -181,48 +180,6 @@ class StableDiffusionProcessing():
         conditioning = 2. * (conditioning - depth_min) / (depth_max - depth_min) - 1.
         return conditioning
 
-=======
-        if self.sampler.conditioning_key not in {'hybrid', 'concat'}:
-            # Dummy zero conditioning if we're not using inpainting model.
-            # Still takes up a bit of memory, but no encoder call.
-            # Pretty sure we can just make this a 1x1 image since its not going to be used besides its batch size.
-            return x.new_zeros(x.shape[0], 5, 1, 1)
-
-        self.is_using_inpainting_conditioning = True
-
-        height = height or self.height
-        width = width or self.width
-
-        # The "masked-image" in this case will just be all zeros since the entire image is masked.
-        image_conditioning = torch.zeros(x.shape[0], 3, height, width, device=x.device)
-        image_conditioning = self.sd_model.get_first_stage_encoding(self.sd_model.encode_first_stage(image_conditioning))
-
-        # Add the fake full 1s mask to the first dimension.
-        image_conditioning = torch.nn.functional.pad(image_conditioning, (0, 0, 0, 0, 1, 0), value=1.0)
-        image_conditioning = image_conditioning.to(x.dtype)
-
-        return image_conditioning
-
-    def depth2img_image_conditioning(self, source_image):
-        # Use the AddMiDaS helper to Format our source image to suit the MiDaS model
-        transformer = AddMiDaS(model_type="dpt_hybrid")
-        transformed = transformer({"jpg": rearrange(source_image[0], "c h w -> h w c")})
-        midas_in = torch.from_numpy(transformed["midas_in"][None, ...]).to(device=shared.device)
-        midas_in = repeat(midas_in, "1 ... -> n ...", n=self.batch_size)
-
-        conditioning_image = self.sd_model.get_first_stage_encoding(self.sd_model.encode_first_stage(source_image))
-        conditioning = torch.nn.functional.interpolate(
-            self.sd_model.depth_model(midas_in),
-            size=conditioning_image.shape[2:],
-            mode="bicubic",
-            align_corners=False,
-        )
-
-        (depth_min, depth_max) = torch.aminmax(conditioning)
-        conditioning = 2. * (conditioning - depth_min) / (depth_max - depth_min) - 1.
-        return conditioning
-
->>>>>>> Stashed changes
     def inpainting_image_conditioning(self, source_image, latent_image, image_mask = None):
         self.is_using_inpainting_conditioning = True
 
@@ -465,7 +422,7 @@ def fix_seed(p):
     p.subseed = get_fixed_seed(p.subseed)
 
 
-def create_infotext(p, all_prompts, all_seeds, all_subseeds, comments, iteration=0, position_in_batch=0):
+def create_infotext(p, all_prompts, all_seeds, all_subseeds, comments=None, iteration=0, position_in_batch=0):
     index = position_in_batch + iteration * p.batch_size
 
     clip_skip = getattr(p, 'clip_skip', opts.CLIP_stop_at_last_layers)
@@ -509,9 +466,15 @@ def process_images(p: StableDiffusionProcessing) -> Processed:
     try:
         for k, v in p.override_settings.items():
             setattr(opts, k, v)
-            if k == 'sd_hypernetwork': shared.reload_hypernetworks()  # make onchange call for changing hypernet
-            if k == 'sd_model_checkpoint': sd_models.reload_model_weights()  # make onchange call for changing SD model
-            if k == 'sd_vae': sd_vae.reload_vae_weights()  # make onchange call for changing VAE
+            if k == 'sd_hypernetwork':
+                shared.reload_hypernetworks()  # make onchange call for changing hypernet
+
+            if k == 'sd_model_checkpoint':
+                sd_models.reload_model_weights()  # make onchange call for changing SD model
+                p.sd_model = shared.sd_model
+
+            if k == 'sd_vae':
+                sd_vae.reload_vae_weights()  # make onchange call for changing VAE
 
         res = process_images_inner(p)
 
@@ -581,6 +544,29 @@ def process_images_inner(p: StableDiffusionProcessing) -> Processed:
     infotexts = []
     output_images = []
 
+    cached_uc = [None, None]
+    cached_c = [None, None]
+
+    def get_conds_with_caching(function, required_prompts, steps, cache):
+        """
+        Returns the result of calling function(shared.sd_model, required_prompts, steps)
+        using a cache to store the result if the same arguments have been used before.
+
+        cache is an array containing two elements. The first element is a tuple
+        representing the previously used arguments, or None if no arguments
+        have been used before. The second element is where the previously
+        computed result is stored.
+        """
+
+        if cache[0] is not None and (required_prompts, steps) == cache[0]:
+            return cache[1]
+
+        with devices.autocast():
+            cache[1] = function(shared.sd_model, required_prompts, steps)
+
+        cache[0] = (required_prompts, steps)
+        return cache[1]
+
     with torch.no_grad(), p.sd_model.ema_scope():
         with devices.autocast():
             p.init(p.all_prompts, p.all_seeds, p.all_subseeds)
@@ -608,9 +594,8 @@ def process_images_inner(p: StableDiffusionProcessing) -> Processed:
             if p.scripts is not None:
                 p.scripts.process_batch(p, batch_number=n, prompts=prompts, seeds=seeds, subseeds=subseeds)
 
-            with devices.autocast():
-                uc = prompt_parser.get_learned_conditioning(shared.sd_model, negative_prompts, p.steps)
-                c = prompt_parser.get_multicond_learned_conditioning(shared.sd_model, prompts, p.steps)
+            uc = get_conds_with_caching(prompt_parser.get_learned_conditioning, negative_prompts, p.steps, cached_uc)
+            c = get_conds_with_caching(prompt_parser.get_multicond_learned_conditioning, prompts, p.steps, cached_c)
 
             if len(model_hijack.comments) > 0:
                 for comment in model_hijack.comments:
@@ -702,30 +687,102 @@ def process_images_inner(p: StableDiffusionProcessing) -> Processed:
     return res
 
 
+def old_hires_fix_first_pass_dimensions(width, height):
+    """old algorithm for auto-calculating first pass size"""
+
+    desired_pixel_count = 512 * 512
+    actual_pixel_count = width * height
+    scale = math.sqrt(desired_pixel_count / actual_pixel_count)
+    width = math.ceil(scale * width / 64) * 64
+    height = math.ceil(scale * height / 64) * 64
+
+    return width, height
+
+
 class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
     sampler = None
 
-    def __init__(self, enable_hr: bool = False, denoising_strength: float = 0.75, firstphase_width: int = 0, firstphase_height: int = 0, hr_scale: float = 2.0, hr_upscaler: str = None, **kwargs):
+    def __init__(self, enable_hr: bool = False, denoising_strength: float = 0.75, firstphase_width: int = 0, firstphase_height: int = 0, hr_scale: float = 2.0, hr_upscaler: str = None, hr_second_pass_steps: int = 0, hr_resize_x: int = 0, hr_resize_y: int = 0, **kwargs):
         super().__init__(**kwargs)
         self.enable_hr = enable_hr
         self.denoising_strength = denoising_strength
         self.hr_scale = hr_scale
         self.hr_upscaler = hr_upscaler
+        self.hr_second_pass_steps = hr_second_pass_steps
+        self.hr_resize_x = hr_resize_x
+        self.hr_resize_y = hr_resize_y
+        self.hr_upscale_to_x = hr_resize_x
+        self.hr_upscale_to_y = hr_resize_y
 
         if firstphase_width != 0 or firstphase_height != 0:
-            print("firstphase_width/firstphase_height no longer supported; use hr_scale", file=sys.stderr)
-            self.hr_scale = self.width / firstphase_width
+            self.hr_upscale_to_x = self.width
+            self.hr_upscale_to_y = self.height
             self.width = firstphase_width
             self.height = firstphase_height
 
+        self.truncate_x = 0
+        self.truncate_y = 0
+        self.applied_old_hires_behavior_to = None
+
     def init(self, all_prompts, all_seeds, all_subseeds):
         if self.enable_hr:
-            if state.job_count == -1:
-                state.job_count = self.n_iter * 2
-            else:
-                state.job_count = state.job_count * 2
+            if opts.use_old_hires_fix_width_height and self.applied_old_hires_behavior_to != (self.width, self.height):
+                self.hr_resize_x = self.width
+                self.hr_resize_y = self.height
+                self.hr_upscale_to_x = self.width
+                self.hr_upscale_to_y = self.height
 
-            self.extra_generation_params["Hires upscale"] = self.hr_scale
+                self.width, self.height = old_hires_fix_first_pass_dimensions(self.width, self.height)
+                self.applied_old_hires_behavior_to = (self.width, self.height)
+
+            if self.hr_resize_x == 0 and self.hr_resize_y == 0:
+                self.extra_generation_params["Hires upscale"] = self.hr_scale
+                self.hr_upscale_to_x = int(self.width * self.hr_scale)
+                self.hr_upscale_to_y = int(self.height * self.hr_scale)
+            else:
+                self.extra_generation_params["Hires resize"] = f"{self.hr_resize_x}x{self.hr_resize_y}"
+
+                if self.hr_resize_y == 0:
+                    self.hr_upscale_to_x = self.hr_resize_x
+                    self.hr_upscale_to_y = self.hr_resize_x * self.height // self.width
+                elif self.hr_resize_x == 0:
+                    self.hr_upscale_to_x = self.hr_resize_y * self.width // self.height
+                    self.hr_upscale_to_y = self.hr_resize_y
+                else:
+                    target_w = self.hr_resize_x
+                    target_h = self.hr_resize_y
+                    src_ratio = self.width / self.height
+                    dst_ratio = self.hr_resize_x / self.hr_resize_y
+
+                    if src_ratio < dst_ratio:
+                        self.hr_upscale_to_x = self.hr_resize_x
+                        self.hr_upscale_to_y = self.hr_resize_x * self.height // self.width
+                    else:
+                        self.hr_upscale_to_x = self.hr_resize_y * self.width // self.height
+                        self.hr_upscale_to_y = self.hr_resize_y
+
+                    self.truncate_x = (self.hr_upscale_to_x - target_w) // opt_f
+                    self.truncate_y = (self.hr_upscale_to_y - target_h) // opt_f
+
+            # special case: the user has chosen to do nothing
+            if self.hr_upscale_to_x == self.width and self.hr_upscale_to_y == self.height:
+                self.enable_hr = False
+                self.denoising_strength = None
+                self.extra_generation_params.pop("Hires upscale", None)
+                self.extra_generation_params.pop("Hires resize", None)
+                return
+
+            if not state.processing_has_refined_job_count:
+                if state.job_count == -1:
+                    state.job_count = self.n_iter
+
+                shared.total_tqdm.updateTotal((self.steps + (self.hr_second_pass_steps or self.steps)) * state.job_count)
+                state.job_count = state.job_count * 2
+                state.processing_has_refined_job_count = True
+
+            if self.hr_second_pass_steps:
+                self.extra_generation_params["Hires steps"] = self.hr_second_pass_steps
+
             if self.hr_upscaler is not None:
                 self.extra_generation_params["Hires upscaler"] = self.hr_upscaler
 
@@ -742,15 +799,9 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
         if not self.enable_hr:
             return samples
 
-        target_width = int(self.width * self.hr_scale)
-        target_height = int(self.height * self.hr_scale)
+        target_width = self.hr_upscale_to_x
+        target_height = self.hr_upscale_to_y
 
-<<<<<<< Updated upstream
-=======
-        samples = samples[:, :, self.truncate_y//2:samples.shape[2]-self.truncate_y//2, self.truncate_x//2:samples.shape[3]-self.truncate_x//2]
-
-        """saves image before applying hires fix, if enabled in options; takes as an argument either an image or batch with latent space images"""
->>>>>>> Stashed changes
         def save_intermediate(image, index):
             """saves image before applying hires fix, if enabled in options; takes as an argument either an image or batch with latent space images"""
 
@@ -804,13 +855,15 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
 
         self.sampler = sd_samplers.create_sampler(self.sampler_name, self.sd_model)
 
+        samples = samples[:, :, self.truncate_y//2:samples.shape[2]-(self.truncate_y+1)//2, self.truncate_x//2:samples.shape[3]-(self.truncate_x+1)//2]
+
         noise = create_random_tensors(samples.shape[1:], seeds=seeds, subseeds=subseeds, subseed_strength=subseed_strength, p=self)
 
         # GC now before running the next img2img to prevent running out of memory
         x = None
         devices.torch_gc()
 
-        samples = self.sampler.sample_img2img(self, samples, noise, conditioning, unconditional_conditioning, steps=self.steps, image_conditioning=image_conditioning)
+        samples = self.sampler.sample_img2img(self, samples, noise, conditioning, unconditional_conditioning, steps=self.hr_second_pass_steps or self.steps, image_conditioning=image_conditioning)
 
         return samples
 

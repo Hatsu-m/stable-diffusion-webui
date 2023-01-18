@@ -140,7 +140,6 @@ def run_bind():
                     func = send_image_and_dimensions if destination_width_component else lambda x: x
                     jsfunc = None
 
-<<<<<<< Updated upstream
                 button.click(
                     fn=func,
                     _js=jsfunc,
@@ -151,11 +150,6 @@ def run_bind():
             if send_generate_info and fields is not None:
                 if send_generate_info in paste_fields:
                     paste_field_names = ['Prompt', 'Negative prompt', 'Steps', 'Face restoration'] + (["Seed"] if shared.opts.send_seed else [])
-=======
-            if send_generate_info and paste_fields[tab]["fields"] is not None:
-                if send_generate_info in paste_fields:
-                    paste_field_names = ['Prompt', 'Negative prompt', 'Steps', 'Face restoration'] +  (['Size-1', 'Size-2'] if shared.opts.send_size else []) + (["Seed"] if shared.opts.send_seed else [])
->>>>>>> Stashed changes
                     button.click(
                         fn=lambda *x: x,
                         inputs=[field for field, name in paste_fields[send_generate_info]["fields"] if name in paste_field_names],
@@ -196,13 +190,21 @@ def find_hypernetwork_key(hypernet_name, hypernet_hash=None):
     return None
 
 
-<<<<<<< Updated upstream
 def restore_old_hires_fix_params(res):
     """for infotexts that specify old First pass size parameter, convert it into
     width, height, and hr scale"""
 
     firstpass_width = res.get('First pass size-1', None)
     firstpass_height = res.get('First pass size-2', None)
+
+    if shared.opts.use_old_hires_fix_width_height:
+        hires_width = int(res.get("Hires resize-1", 0))
+        hires_height = int(res.get("Hires resize-2", 0))
+
+        if hires_width and hires_height:
+            res['Size-1'] = hires_width
+            res['Size-2'] = hires_height
+            return
 
     if firstpass_width is None or firstpass_height is None:
         return
@@ -212,22 +214,15 @@ def restore_old_hires_fix_params(res):
     height = int(res.get("Size-2", 512))
 
     if firstpass_width == 0 or firstpass_height == 0:
-        # old algorithm for auto-calculating first pass size
-        desired_pixel_count = 512 * 512
-        actual_pixel_count = width * height
-        scale = math.sqrt(desired_pixel_count / actual_pixel_count)
-        firstpass_width = math.ceil(scale * width / 64) * 64
-        firstpass_height = math.ceil(scale * height / 64) * 64
-
-    hr_scale = width / firstpass_width if firstpass_width > 0 else height / firstpass_height
+        from modules import processing
+        firstpass_width, firstpass_height = processing.old_hires_fix_first_pass_dimensions(width, height)
 
     res['Size-1'] = firstpass_width
     res['Size-2'] = firstpass_height
-    res['Hires upscale'] = hr_scale
+    res['Hires resize-1'] = width
+    res['Hires resize-2'] = height
 
 
-=======
->>>>>>> Stashed changes
 def parse_generation_parameters(x: str):
     """parses generation parameters string, the one you see in text field under the picture in UI:
 ```
@@ -285,11 +280,12 @@ Steps: 20, Sampler: Euler a, CFG scale: 7, Seed: 965400086, Size: 512x512, Model
         hypernet_hash = res.get("Hypernet hash", None)
         res["Hypernet"] = find_hypernetwork_key(hypernet_name, hypernet_hash)
 
-<<<<<<< Updated upstream
+    if "Hires resize-1" not in res:
+        res["Hires resize-1"] = 0
+        res["Hires resize-2"] = 0
+
     restore_old_hires_fix_params(res)
 
-=======
->>>>>>> Stashed changes
     return res
 
 

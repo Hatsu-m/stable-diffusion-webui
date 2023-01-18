@@ -1,12 +1,16 @@
+1anal.pt
 8con.pt
 as109-60000.pt
 bad-artist.pt
-bad-image-v2-39000.pt
 badhands.pt
 badhands1.pt
+badimage.pt
 bad_prompt.pt
 BlindScape1g.pt
 cancer.pt
+CharTurner.pt
+cynthia.pt
+cynthia1.pt
 e2iatm.pt
 gtaV.pt
 j4acm4.pt
@@ -14,4 +18,5 @@ ms2-ti.pt
 Senri2-30000.pt
 spadeq.pt
 tobi.pt
+tsunade-9200.pt
 xcygvk.pt

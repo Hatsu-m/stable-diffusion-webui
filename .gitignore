@@ -32,5 +32,3 @@ notification.mp3
 /extensions
 /test/stdout.txt
 /test/stderr.txt
-*.py
-modules/api/api.py
